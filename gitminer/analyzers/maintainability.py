@@ -1,3 +1,5 @@
+# Arquivo: gitminer-cli/gitminer/analyzers/maintainability.py
+
 import ast
 import math
 import pandas as pd
@@ -32,3 +34,29 @@ class HalsteadMetricsVisitor(ast.NodeVisitor):
             self.total_operands += 1
         
         super().visit(node)
+
+def calculate_halstead_volume(code: str) -> float:
+    """Calcula o Volume Halstead para um trecho de código."""
+    try:
+        tree = ast.parse(code)
+        visitor = HalsteadMetricsVisitor()
+        visitor.visit(tree)
+
+        n1 = len(visitor.operators)  # Número de operadores distintos
+        n2 = len(visitor.operands)   # Número de operandos distintos
+        N1 = visitor.total_operators # Número total de operadores
+        N2 = visitor.total_operands  # Número total de operandos
+
+        # Vocabulário e Comprimento do programa
+        vocabulary = n1 + n2
+        length = N1 + N2
+        
+        if vocabulary == 0:
+            return 0.0
+
+        # Volume Halstead
+        volume = length * math.log2(vocabulary)
+        return volume
+    except (SyntaxError, ValueError):
+        # Retorna 0 se o código não puder ser parseado
+        return 0.0
