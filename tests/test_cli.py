@@ -27,3 +27,24 @@ def test_cli_export_command(tmp_path, test_repo):
     assert result.exit_code == 0
     assert "Exportando dados" in result.stdout
     assert (output_dir / "commits_analysis.csv").exists()
+
+def test_cli_invalid_repo():
+    result = runner.invoke(app, ["analyze", "caminho/que/nao/existe"])
+    assert result.exit_code != 0
+    assert (
+        "Repositório inválido" in result.stdout
+        or "Error" in result.stdout
+        or "Invalid value" in result.stdout
+    )
+
+def test_cli_no_args_shows_help():
+    result = runner.invoke(app, [])
+    assert "Usage" in result.stdout or "uso" in result.stdout.lower()
+
+def test_cli_no_arguments():
+    result = runner.invoke(app, ["analyze"])
+    assert result.exit_code != 0
+    assert "Missing argument" in result.stdout or "Error" in result.stdout
+
+
+
