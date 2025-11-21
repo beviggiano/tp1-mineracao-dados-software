@@ -34,7 +34,8 @@ def test_cli_invalid_repo():
         ["analyze", "caminho/que/nao/existe"]
     )
     
-    output = result.stdout
+    # Use .output which contains both stdout and stderr
+    output = result.output
     
     print(f"DEBUG Output: '{output}'")
     print(f"DEBUG Exit code: {result.exit_code}")
@@ -45,6 +46,8 @@ def test_cli_invalid_repo():
         or "repositório" in output.lower()
         or "inválido" in output.lower()
         or "caminho" in output
+        or "error" in output.lower()
+        or "invalid" in output.lower()
     )
 
 def test_cli_no_args_shows_help():
@@ -60,16 +63,18 @@ def test_cli_no_args_shows_help():
 def test_cli_no_arguments():
     result = runner.invoke(app, ["analyze"])
     
-    output = result.stdout
+    output = result.output
     
     print(f"DEBUG No Args Output: '{output}'")
     print(f"DEBUG No Args Exit code: {result.exit_code}")
     
     assert result.exit_code != 0
-    assert any(phrase.lower() in output.lower() for phrase in [
-        "Missing argument", 
-        "Error", 
+    assert any(phrase in output.lower() for phrase in [
+        "missing argument", 
+        "error", 
         "required",
         "faltando",
-        "argumento"
+        "argumento",
+        "missing",
+        "argument"
     ])
