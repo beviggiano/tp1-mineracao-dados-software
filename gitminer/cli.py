@@ -13,17 +13,17 @@ app = typer.Typer(help="GitMiner: Uma ferramenta CLI para mineração de reposit
 def _validate_repo_path(repo_path: Path) -> None:
     """Verifica se o caminho é um repositório Git válido."""
     if not repo_path.is_dir():
-        print(f"❌ Erro: O caminho '{repo_path}' não é um diretório válido.")
+        typer.echo(f"❌ Erro: O caminho '{repo_path}' não é um diretório válido.", err=True)
         raise typer.Exit(code=1)
     try:
         _ = git.Repo(repo_path)
     except git.InvalidGitRepositoryError:
-        print(f"❌ Erro: O diretório '{repo_path}' não é um repositório Git válido.")
+        typer.echo(f"❌ Erro: O diretório '{repo_path}' não é um repositório Git válido.", err=True)
         raise typer.Exit(code=1)
 
 @app.command()
 def analyze(
-    repo_path: Annotated[Path, typer.Argument(exists=True, file_okay=False, help="Caminho para o repositório Git local.")]
+    repo_path: Annotated[Path, typer.Argument(exists=False, file_okay=False, help="Caminho para o repositório Git local.")]
 ):
     """Roda todas as análises e exibe um relatório resumido."""
     _validate_repo_path(repo_path)
