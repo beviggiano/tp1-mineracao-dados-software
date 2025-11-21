@@ -1,6 +1,7 @@
 from typer.testing import CliRunner
-from gitminer.cli import app
+from gitminer.cli import app, _validate_repo_path
 from git import Repo
+import pytest
 
 runner = CliRunner()
 
