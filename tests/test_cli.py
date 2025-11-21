@@ -29,7 +29,7 @@ def test_cli_export_command(tmp_path, test_repo):
     assert (output_dir / "commits_analysis.csv").exists()
 
 def test_cli_invalid_repo():
-    result = runner.invoke(app, ["analyze", "caminho/que/nao/existe"])
+    result = runner.invoke(app, ["analyze", "caminho/que/nao/existe"], mix_stderr=True)
 
     output = (result.stdout or "") + (result.stderr or "")
 
@@ -42,14 +42,14 @@ def test_cli_invalid_repo():
 
 
 def test_cli_no_args_shows_help():
-    result = runner.invoke(app, [])
+    result = runner.invoke(app, [], mix_stderr=True)
 
     output = (result.stdout or "") + (result.stderr or "")
 
     assert "Usage" in output or "uso" in output.lower()
 
 def test_cli_no_arguments():
-    result = runner.invoke(app, ["analyze"])
+    result = runner.invoke(app, [], mix_stderr=True)
 
     output = (result.stdout or "") + (result.stderr or "")
 
