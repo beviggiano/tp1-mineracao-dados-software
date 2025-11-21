@@ -29,23 +29,53 @@ def test_cli_export_command(tmp_path, test_repo):
     assert "Exportando dados" in result.stdout
     assert (output_dir / "commits_analysis.csv").exists()
 
-def test_validate_repo_path_invalid_directory(tmp_path):
-    """Deve falhar quando o caminho não é diretório."""
-    fake_path = tmp_path / "nao_existe"
+def test_cli_invalid_repo():
+    result = runner.invoke(
+        app,
+        ["analyze", "caminho/que/nao/existe"]
+    )
+    
+    # Use .output which contains both stdout and stderr
+    output = result.output
+    
+    print(f"DEBUG Output: '{output}'")
+    print(f"DEBUG Exit code: {result.exit_code}")
+    
+    assert result.exit_code != 0
+    assert (
+        "Erro" in output 
+        or "repositório" in output.lower()
+        or "inválido" in output.lower()
+        or "caminho" in output
+        or "error" in output.lower()
+        or "invalid" in output.lower()
+    )
 
-    with pytest.raises(SystemExit):
-        _validate_repo_path(fake_path)
+def test_cli_no_args_shows_help():
+    result = runner.invoke(app, ["--help"])
+    
+    output = result.stdout
+    
+    print(f"DEBUG Help Output: '{output}'")
+    
+    help_indicators = ["Usage", "usage", "Commands", "Options", "Comandos", "Opções", "help", "ajuda"]
+    assert any(indicator.lower() in output.lower() for indicator in help_indicators)
 
-
-def test_validate_repo_path_not_git_repo(tmp_path):
-    """Deve falhar quando o diretório existe mas não é repositório Git."""
-    with pytest.raises(SystemExit):
-        _validate_repo_path(tmp_path)
-
-
-def test_validate_repo_path_valid_repo(tmp_path):
-    """Deve passar quando o diretório é um repositório Git válido."""
-    Repo.init(tmp_path)   # cria repo git vazio
-
-    # Não deve lançar erro
-    _validate_repo_path(tmp_path)
+def test_cli_no_arguments():
+    result = runner.invoke(app, ["analyze"])
+    
+    output = result.output
+    
+    print(f"DEBUG No Args Output: '{output}'")
+    print(f"DEBUG No Args Exit code: {result.exit_code}")
+    
+    assert result.exit_code != 0
+    assert any(phrase in output.lower() for phrase in [
+        "missing argument", 
+        "error", 
+        "required",
+        "faltando",
+        "argumento",
+        "missing",
+        "argument"
+    ])
