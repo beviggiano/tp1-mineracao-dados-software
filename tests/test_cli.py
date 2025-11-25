@@ -56,6 +56,55 @@ def test_cli_invalid_repo():
         or "invalid" in output.lower()
     )
 
+# ---------------------------
+# Testes Negativos do CLI
+# ---------------------------
+
+def test_cli_invalid_path():
+    """Deve falhar quando o caminho não existe."""
+    result = runner.invoke(app, ["analyze", "caminho/invalido"])
+    
+    assert result.exit_code != 0
+    assert "não é um diretório válido" in result.stdout
+
+
+def test_cli_not_a_git_repo(tmp_path):
+    """Deve falhar quando o diretório existe mas não é um repositório Git."""
+    result = runner.invoke(app, ["analyze", str(tmp_path)])
+    
+    assert result.exit_code != 0
+    assert "não é um repositório Git válido" in result.stdout
+
+
+def test_cli_security_invalid_repo(tmp_path):
+    """Security deve falhar com diretório não-git."""
+    result = runner.invoke(app, ["security", str(tmp_path)])
+    
+    assert result.exit_code != 0
+    assert "não é um repositório Git válido" in result.stdout
+
+
+def test_cli_export_invalid_repo(tmp_path):
+    """Export deve falhar com diretório não-git."""
+    result = runner.invoke(app, ["export", str(tmp_path), "--output-dir", str(tmp_path)])
+    
+    assert result.exit_code != 0
+    assert "não é um repositório Git válido" in result.stdout
+
+
+def test_cli_plot_invalid_metric(test_repo, tmp_path):
+    """Plot deve falhar com métrica não suportada."""
+    result = runner.invoke(app, [
+        "plot",
+        test_repo,
+        "--metric", "banana",
+        "--output-dir", str(tmp_path)
+    ])
+    
+    assert result.exit_code != 0
+    assert "Métrica 'banana' não suportada" in result.stdout
+
+
 def test_cli_no_args_shows_help():
     result = runner.invoke(app, ["--help"])
     
