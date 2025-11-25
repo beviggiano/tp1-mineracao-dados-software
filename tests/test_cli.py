@@ -57,7 +57,7 @@ def test_cli_analyze_command(test_repo):
 def test_cli_security_command(test_repo):
     result = runner.invoke(app, ["security", test_repo])
     assert result.exit_code == 0
-    assert "Análise de segurança concluída" in result.stdout
+    assert "Nenhum problema de segurança" in result.stdout
 
 
 def test_cli_export_command(test_repo, tmp_path):
